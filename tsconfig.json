@@ -1,12 +1,13 @@
 {
   "include": ["src"],
-  // include 안에 있는 파일들을 js로 컴파일 한다
-  // src 안에 있는 모든 ts파일을 js로
   "compilerOptions": {
-    "target": "es2020",
-    // 어느 버전의 자바스크립트로 컴파일 할지, 호환성을 위해 es6가 제일 좋음
+    "target": "esnext",
     "module": "ESNext",
-    "outDir": "build", //자바스크립트 파일이 생성될 폴더
+    "outDir": "build",
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"]
+    },
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,13 +15,7 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "lib": ["es2020", "dom"],
-    // 타입스크립트가 실행될 환경을 알려줌.
-    // es2020: es2020을 지원하는 서버에서 돌아갈 것
-    // dom: 브라우저에서 돌아갈 것
-    // 이걸 써두면 document. 이렇게하면 브라우저의 api 정보를 가지고 있게 되어서 자동완성등을 지원해줌.
-    // 어떤 api를 내가 쓸지 아니가 typescript에서 브라우저 api의 타입을 알게됨.
+    "lib": ["esnext", "dom"],
     "allowJs": true
-    // js파일도 사용할 수 있게 됨
   }
 }
