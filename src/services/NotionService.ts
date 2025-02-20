@@ -1,35 +1,35 @@
-// const { Client } = require("@notionhq/client");
 import { Client } from "@notionhq/client";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
-(async () => {
+const DB_ID = process.env.NOTION_DATABASE_ID;
+
+if (!DB_ID) {
+  throw new Error("NOTION_API_KEY 환경 변수가 설정되지 않았습니다.");
+}
+
+// ()();
+
+const createPage = async () => {
   const response = await notion.pages.create({
-    cover: {
-      type: "external",
-      external: {
-        url: "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg",
-      },
-    },
-    icon: {
-      type: "emoji",
-      emoji: "🥬",
-    },
     parent: {
       type: "database_id",
-      database_id: "d9824bdc-8445-4327-be8b-5b47500af6ce",
+      database_id: DB_ID,
     },
     properties: {
-      Name: {
+      Words: {
         title: [
           {
             text: {
-              content: "Tuscan kale",
+              content: "New Media Article",
             },
           },
         ],
       },
-      Description: {
+      Definition1: {
         rich_text: [
           {
             text: {
@@ -38,10 +38,23 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
           },
         ],
       },
-      "Food group": {
-        select: {
-          name: "🥬 Vegetable",
-        },
+      Definition2: {
+        rich_text: [
+          {
+            text: {
+              content: "A dark green leafy vegetable",
+            },
+          },
+        ],
+      },
+      "Example Sentence": {
+        rich_text: [
+          {
+            text: {
+              content: "A dark green leafy vegetable",
+            },
+          },
+        ],
       },
     },
     children: [
@@ -69,7 +82,6 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
                   url: "https://en.wikipedia.org/wiki/Lacinato_kale",
                 },
               },
-              href: "https://en.wikipedia.org/wiki/Lacinato_kale",
             },
           ],
           color: "default",
@@ -78,4 +90,4 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
     ],
   });
   console.log(response);
-})();
+};
