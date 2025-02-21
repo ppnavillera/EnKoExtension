@@ -1,30 +1,113 @@
+import { DictionaryResponse } from "@/types/dictionary";
 import { Client } from "@notionhq/client";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const notion = new Client({ auth: process.env.NOTION_API_KEY });
-
-const DB_ID = process.env.NOTION_DATABASE_ID;
-
-if (!DB_ID) {
-  throw new Error("NOTION_API_KEY 환경 변수가 설정되지 않았습니다.");
+import { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
+interface NotionProperties {
+  Words: {
+    title: Array<{
+      text: {
+        content: string;
+      };
+    }>;
+  };
+  Definition1: {
+    rich_text: Array<{
+      text: {
+        content: string;
+      };
+    }>;
+  };
+  Definition2?: {
+    // optional property로 정의
+    rich_text: Array<{
+      text: {
+        content: string;
+      };
+    }>;
+  };
+  "Example Sentence": {
+    rich_text: Array<{
+      text: {
+        content: string;
+      };
+    }>;
+  };
 }
+export class NotionService {
+  private notion: Client;
+  private dbId: string;
 
-// ()();
+  constructor(apiKey: string, dbId: string) {
+    this.notion = new Client({ auth: apiKey });
+    this.dbId = dbId;
+  }
 
-const createPage = async () => {
-  const response = await notion.pages.create({
-    parent: {
-      type: "database_id",
-      database_id: DB_ID,
-    },
-    properties: {
+  async createPage(data: DictionaryResponse) {
+    // const properties = {
+    //   Words: {
+    //     title: [
+    //       {
+    //         text: {
+    //           content: data.word,
+    //         },
+    //       },
+    //     ],
+    //   },
+    //   Definition1: {
+    //     rich_text: [
+    //       {
+    //         text: {
+    //           content: data.definition1,
+    //         },
+    //       },
+    //     ],
+    //   },
+    //   "Example Sentence": {
+    //     rich_text: [
+    //       {
+    //         text: {
+    //           content: data.example,
+    //         },
+    //       },
+    //     ],
+    //   },
+    //   // Definition2는 선택적이므로, data.definition2가 존재할 때만 추가합니다.
+    //   ...(data.definition2 && {
+    //     Definition2: {
+    //       rich_text: [
+    //         {
+    //           text: {
+    //             content: data.definition2,
+    //           },
+    //         },
+    //       ],
+    //     },
+    //   }),
+    //   ...(data.synonyms && {
+    //     synonyms: {
+    //       rich_text: data.synonyms.map((synonym) => ({
+    //         text: {
+    //           content: synonym,
+    //         },
+    //       })),
+    //     },
+    //   }),
+    //   ...(data.antonyms && {
+    //     antonyms: {
+    //       rich_text: data.antonyms.map((antonym) => ({
+    //         text: {
+    //           content: antonym,
+    //         },
+    //       })),
+    //     },
+    //   }),
+    // };
+    // properties 객체를 먼저 생성
+    const properties: CreatePageParameters["properties"] = {
       Words: {
         title: [
           {
             text: {
-              content: "New Media Article",
+              content: data.word,
             },
           },
         ],
@@ -33,16 +116,7 @@ const createPage = async () => {
         rich_text: [
           {
             text: {
-              content: "A dark green leafy vegetable",
-            },
-          },
-        ],
-      },
-      Definition2: {
-        rich_text: [
-          {
-            text: {
-              content: "A dark green leafy vegetable",
+              content: data.definition1,
             },
           },
         ],
@@ -51,43 +125,54 @@ const createPage = async () => {
         rich_text: [
           {
             text: {
-              content: "A dark green leafy vegetable",
+              content: data.example,
             },
           },
         ],
       },
-    },
-    children: [
-      {
-        object: "block",
-        heading_2: {
-          rich_text: [
-            {
-              text: {
-                content: "Lacinato kale",
-              },
+    };
+
+    // definition2가 null이 아닐 때만 추가
+    if (data.definition2 !== null) {
+      properties.Definition2 = {
+        rich_text: [
+          {
+            text: {
+              content: data.definition2,
             },
-          ],
-        },
-      },
-      {
-        object: "block",
-        paragraph: {
-          rich_text: [
-            {
-              text: {
-                content:
-                  "Lacinato kale is a variety of kale with a long tradition in Italian cuisine, especially that of Tuscany. It is also known as Tuscan kale, Italian kale, dinosaur kale, kale, flat back kale, palm tree kale, or black Tuscan palm.",
-                link: {
-                  url: "https://en.wikipedia.org/wiki/Lacinato_kale",
-                },
-              },
+          },
+        ],
+      };
+    }
+    if (data.synonyms !== null) {
+      properties.Synonyms = {
+        rich_text: [
+          {
+            text: {
+              content: data.synonyms.join(","),
             },
-          ],
-          color: "default",
-        },
+          },
+        ],
+      };
+    }
+    if (data.antonyms !== null) {
+      properties.Antonyms = {
+        rich_text: [
+          {
+            text: {
+              content: data.antonyms.join(","),
+            },
+          },
+        ],
+      };
+    }
+    const response = await this.notion.pages.create({
+      parent: {
+        type: "database_id",
+        database_id: this.dbId,
       },
-    ],
-  });
-  console.log(response);
-};
+      properties: properties,
+    });
+    console.log(response);
+  }
+}
