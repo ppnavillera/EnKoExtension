@@ -1,25 +1,23 @@
 // // const { GoogleGenerativeAI } = require("@google/generative-ai");
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
-import dotenv from "dotenv";
 
-dotenv.config();
+export class GeminiService {
+  private genAI: GoogleGenerativeAI;
+  private model: any;
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-if (GEMINI_API_KEY === undefined) throw new Error("GEMINI_API_KEY is not set");
+  constructor(apiKey: string) {
+    this.genAI = new GoogleGenerativeAI(apiKey);
+    this.model = this.genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        // responseSchema: schema,
+      },
+    });
+  }
 
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
-  generationConfig: {
-    responseMimeType: "application/json",
-    // responseSchema: schema,
-  },
-});
-
-const word = "sunny";
-
-const prompt = `For the given English word, please provide its Korean meanings and related information following the JSON format below. Fill in each field as accurately as possible. If a field does not apply, use \`null\`.
+  async getDefinition(word: string) {
+    const prompt = `For the given English word, please provide its Korean meanings and related information following the JSON format below. Fill in each field as accurately as possible. If a field does not apply, use \`null\`.
 
 \`\`\`json
 {
@@ -83,7 +81,8 @@ A:
 }
 \`\`\`
 `;
-
-const result = await model.generateContent(prompt);
-const json = JSON.parse(result.response.text());
-console.log(json.word);
+    const result = await this.model.generateContent(prompt);
+    const json = JSON.parse(result.response.text());
+    return json;
+  }
+}
