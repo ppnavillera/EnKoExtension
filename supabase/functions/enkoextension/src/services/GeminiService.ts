@@ -84,6 +84,7 @@ A:
 `;
     const result = await this.model.generateContent(prompt);
     const json = JSON.parse(result.response.text());
+    console.log(result.response);
     return json;
   }
 }
