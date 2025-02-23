@@ -1,17 +1,19 @@
-import { NotionService } from "./../services/NotionService";
-import { config } from "@/config/env";
-import { GeminiService } from "@/services/GeminiService";
+import { config } from "./../config/env.ts";
+
+import { GeminiService } from "../services/GeminiService.ts";
+import { NotionService } from "../services/NotionService.ts";
 
 export async function handleDictionaryRequest(word: string) {
   const geminiService = new GeminiService(config.GEMINI_API_KEY);
   const notionService = new NotionService(
     config.NOTION_API_KEY,
-    config.NOTION_DATABASE_ID
+    config.NOTION_DATABASE_ID,
   );
 
   try {
     const definition = await geminiService.getDefinition(word);
-    const notionResult = await notionService.createPage(definition);
+    console.log(definition[0]);
+    const notionResult = await notionService.createPage(definition[0]);
     return {
       success: true,
       data: notionResult,
