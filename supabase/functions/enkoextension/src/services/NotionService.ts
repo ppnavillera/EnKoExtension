@@ -1,6 +1,11 @@
-import { DictionaryResponse } from "@/types/dictionary";
-import { Client } from "@notionhq/client";
-import { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
+import { Client } from "npm:@notionhq/client";
+import {
+  CreatePageParameters,
+  PageObjectResponse,
+} from "npm:@notionhq/client/build/src/api-endpoints";
+import { DictionaryResponse } from "../types/dictionary.ts";
+// import { PageObjectResponse } from "npm:@notionhq/client";
+
 interface NotionProperties {
   Words: {
     title: Array<{
@@ -144,7 +149,7 @@ export class NotionService {
         ],
       };
     }
-    if (data.synonyms !== null) {
+    if (data.synonyms != null) {
       properties.Synonyms = {
         rich_text: [
           {
@@ -155,7 +160,7 @@ export class NotionService {
         ],
       };
     }
-    if (data.antonyms !== null) {
+    if (data.antonyms != null) {
       properties.Antonyms = {
         rich_text: [
           {
@@ -172,7 +177,50 @@ export class NotionService {
         database_id: this.dbId,
       },
       properties: properties,
-    });
-    console.log(response);
+    }) as PageObjectResponse;
+    type NotionProperty = {
+      type: "title" | "rich_text";
+      title?: Array<{ text: { content: string } }>;
+      rich_text?: Array<{ text: { content: string } }>;
+    };
+
+    // 헬퍼 함수 생성
+    const getPropertyContent = (property: NotionProperty): string | null => {
+      if (
+        property.type === "title" && property.title && property.title.length > 0
+      ) {
+        return property.title[0].text.content;
+      }
+      if (
+        property.type === "rich_text" && property.rich_text &&
+        property.rich_text.length > 0
+      ) {
+        return property.rich_text[0].text.content;
+      }
+      return null;
+    };
+
+    // 데이터 할당
+    const result = {
+      word: getPropertyContent(response.properties.Words as NotionProperty),
+      definition1: getPropertyContent(
+        response.properties.Definition1 as NotionProperty,
+      ),
+      definition2: getPropertyContent(
+        response.properties.Definition2 as NotionProperty,
+      ),
+      example: getPropertyContent(
+        response.properties["Example Sentence"] as NotionProperty,
+      ),
+      synonyms: getPropertyContent(
+        response.properties.Synonyms as NotionProperty,
+      ),
+      antonyms: getPropertyContent(
+        response.properties.Antonyms as NotionProperty,
+      ),
+    };
+
+    console.log(result);
+    return result;
   }
 }
