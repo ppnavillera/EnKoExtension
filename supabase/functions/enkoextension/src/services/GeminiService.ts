@@ -1,5 +1,5 @@
 // // const { GoogleGenerativeAI } = require("@google/generative-ai");
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "npm:@google/generative-ai";
 
 export class GeminiService {
   private genAI: GoogleGenerativeAI;
@@ -17,7 +17,8 @@ export class GeminiService {
   }
 
   async getDefinition(word: string) {
-    const prompt = `For the given English word, please provide its Korean meanings and related information following the JSON format below. Fill in each field as accurately as possible. If a field does not apply, use \`null\`.
+    const prompt =
+      `For the given English word, please provide its Korean meanings and related information following the JSON format below. Fill in each field as accurately as possible. If a field does not apply, use \`null\`.
 
 \`\`\`json
 {
