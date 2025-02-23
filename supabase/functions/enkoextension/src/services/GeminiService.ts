@@ -33,7 +33,7 @@ export class GeminiService {
 
 **Instructions:**
 1. **word**: The provided English word.
-2. **definition1**: The primary meaning of the word, including the part of speech (e.g., "(adj)", "(v)").
+2. **definition1**: The primary meaning of the word, including the part of speech. **Only use the following valid abbreviations for parts of speech: (adj) for adjective, (adv) for adverb, (n) for noun, (v) for verb, and (interj) for interjection.** For example, for a greeting like "hello", use "(interj)".
 3. **definition2**: A secondary meaning (if available); if not, set this to \`null\`.
 4. **example**: A sentence demonstrating the usage of the word.
 5. **synonyms**: An array of synonyms; if there are none, use \`null\`.
