@@ -154,7 +154,7 @@ export class NotionService {
         rich_text: [
           {
             text: {
-              content: data.synonyms.join(","),
+              content: data.synonyms.join(", "),
             },
           },
         ],
@@ -165,7 +165,7 @@ export class NotionService {
         rich_text: [
           {
             text: {
-              content: data.antonyms.join(","),
+              content: data.antonyms.join(", "),
             },
           },
         ],
