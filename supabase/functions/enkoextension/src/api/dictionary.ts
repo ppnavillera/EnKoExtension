@@ -12,9 +12,15 @@ export async function handleDictionaryRequest(word: string) {
 
   try {
     const definition = await geminiService.getDefinition(word);
-    console.log(definition);
-    console.log(definition[0]);
-    const notionResult = await notionService.createPage(definition);
+    console.log(`definition: ${definition}`);
+    console.log(`definition[0]: ${definition[0]}`);
+    let notionResult;
+    if (definition[0] === undefined) {
+      notionResult = await notionService.createPage(definition);
+    } else {
+      notionResult = await notionService.createPage(definition[0]);
+    }
+
     return {
       success: true,
       data: notionResult,
