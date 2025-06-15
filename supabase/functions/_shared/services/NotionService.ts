@@ -1,5 +1,5 @@
 import { Client } from "npm:@notionhq/client";
-import {
+import type {
   CreatePageParameters,
   PageObjectResponse,
 } from "npm:@notionhq/client/build/src/api-endpoints";
