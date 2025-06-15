@@ -6,6 +6,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { handleDictionaryRequest } from "./src/api/dictionary.ts";
+import { getErrorMessage } from "../_shared/utils.ts";
 
 console.log(`Function "browser-with-cors" up and running!`);
 
@@ -27,7 +28,8 @@ Deno.serve(async (req) => {
         status: 200,
       });
     } catch (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+      const errorMessage = getErrorMessage(error);
+      return new Response(JSON.stringify({ error: errorMessage }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
       });
