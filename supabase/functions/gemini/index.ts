@@ -6,49 +6,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { getErrorMessage } from "../_shared/utils.ts";
-import { handleDictionaryRequest } from "../_shared/api/dictionary.ts";
 import { handleGeminiRequest } from "../_shared/api/gemini.ts";
 console.log(`Function "browser-with-cors" up and running!`);
-
-async function handleNotionPost(req: Request): Promise<Response> {
-    try {
-        const request = await req.json();
-        const newWord = request.word;
-
-        const result = await handleDictionaryRequest(newWord);
-
-        return new Response(JSON.stringify(result), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 200,
-        });
-    } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        return new Response(JSON.stringify({ error: errorMessage }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 400,
-        });
-    }
-}
-
-async function handleGeminiPost(req: Request): Promise<Response> {
-    try {
-        const request = await req.json();
-        const newWord = request.word;
-
-        const result = await handleGeminiRequest(newWord);
-
-        return new Response(JSON.stringify(result), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 200,
-        });
-    } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        return new Response(JSON.stringify({ error: errorMessage }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 400,
-        });
-    }
-}
 
 Deno.serve(async (req) => {
     // This is needed if you're planning to invoke your function from a browser.
@@ -56,12 +15,26 @@ Deno.serve(async (req) => {
         return new Response("ok", { headers: corsHeaders });
     }
 
+    if (req.method !== "POST") {
+        return new Response(JSON.stringify({ error: "Method Not Allowed" }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 405,
+        });
+    }
     if (req.method === "POST") {
-        const url = new URL(req.url);
-        if (url.pathname === "/notion") {
-            return await handleNotionPost(req);
-        } else if (url.pathname === "/gemini") {
-            return await handleGeminiPost(req);
+        try {
+            const { word } = await req.json();
+            const result = await handleGeminiRequest(word);
+            return new Response(JSON.stringify(result), {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+                status: 200,
+            });
+        } catch (error) {
+            const errorMessage = getErrorMessage(error);
+            return new Response(JSON.stringify({ error: errorMessage }), {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+                status: 400,
+            });
         }
     }
     return new Response("Not Found", {
