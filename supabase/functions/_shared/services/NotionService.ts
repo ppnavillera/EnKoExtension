@@ -4,39 +4,7 @@ import type {
   PageObjectResponse,
 } from "npm:@notionhq/client/build/src/api-endpoints";
 import { DictionaryResponse } from "../types/dictionary.ts";
-// import { PageObjectResponse } from "npm:@notionhq/client";
 
-interface NotionProperties {
-  Words: {
-    title: Array<{
-      text: {
-        content: string;
-      };
-    }>;
-  };
-  Definition1: {
-    rich_text: Array<{
-      text: {
-        content: string;
-      };
-    }>;
-  };
-  Definition2?: {
-    // optional property로 정의
-    rich_text: Array<{
-      text: {
-        content: string;
-      };
-    }>;
-  };
-  "Example Sentence": {
-    rich_text: Array<{
-      text: {
-        content: string;
-      };
-    }>;
-  };
-}
 export class NotionService {
   private notion: Client;
   private dbId: string;
@@ -218,6 +186,7 @@ export class NotionService {
       antonyms: getPropertyContent(
         response.properties.Antonyms as NotionProperty,
       ),
+      url: response.url,
     };
 
     console.log(result);
