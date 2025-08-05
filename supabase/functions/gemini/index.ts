@@ -15,29 +15,27 @@ Deno.serve(async (req) => {
         return new Response("ok", { headers: corsHeaders });
     }
 
+    // POST 요청이 아닌 경우 405 Method Not Allowed 반환
     if (req.method !== "POST") {
         return new Response(JSON.stringify({ error: "Method Not Allowed" }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
             status: 405,
         });
     }
-    if (req.method === "POST") {
-        try {
-            const { word } = await req.json();
-            const result = await handleGeminiRequest(word);
-            return new Response(JSON.stringify(result), {
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
-                status: 200,
-            });
-        } catch (error) {
-            const errorMessage = getErrorMessage(error);
-            return new Response(JSON.stringify({ error: errorMessage }), {
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
-                status: 400,
-            });
-        }
+
+    // 여기 도달했다면 req.method는 반드시 "POST"이므로 추가 조건문 불필요
+    try {
+        const { word } = await req.json();
+        const result = await handleGeminiRequest(word);
+        return new Response(JSON.stringify(result), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+        });
+    } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        return new Response(JSON.stringify({ error: errorMessage }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 400,
+        });
     }
-    return new Response("Not Found", {
-        status: 404,
-    });
 });
