@@ -1,12 +1,16 @@
-import { config } from "./../config/env.ts";
-
 import { NotionService } from "../services/NotionService.ts";
+import { UserService } from "../services/UserService.ts";
 import { DictionaryResponse } from "../types/dictionary.ts";
+import { UserNotionConfig } from "../types/user.ts";
 
-export async function handleNotionRequest(data: DictionaryResponse) {
+export async function handleNotionRequest(data: DictionaryResponse, userConfig: UserNotionConfig, userId: string) {
+  const userService = new UserService();
   const notionService = new NotionService(
-    config.NOTION_API_KEY,
-    config.NOTION_DATABASE_ID,
+    userConfig.apiKey,
+    userConfig.pageId,
+    userId,
+    userService,
+    userConfig.originalPageId
   );
 
   try {
