@@ -19,6 +19,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@notionhq/client": "^2.2.16",
+    "@supabase/supabase-js": "^2.53.0",
     "dotenv": "^16.4.7",
     "nodemon": "^3.1.9"
   }
